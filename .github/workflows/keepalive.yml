@@ -1,0 +1,21 @@
+name: 24x7 Health Monitor
+
+on:
+  schedule:
+    - cron: '*/5 * * * *'
+  workflow_dispatch:
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Health Check Wave 1 & 2
+        env:
+          TARGET_URL: ${{ secrets.HEALTH_URL }}
+        run: |
+          curl -fsS --max-time 20 "$TARGET_URL" | grep -q '"ok":true'
+          echo "Wave 1 OK at $(date -u)"
+          sleep 120
+          curl -fsS --max-time 20 "$TARGET_URL" | grep -q '"ok":true'
+          echo "Wave 2 OK at $(date -u)"
